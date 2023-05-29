@@ -59,10 +59,10 @@ module.exports = {
       const user = await User.findOne({
         $or: [
           {
-            email, // email: ema@gmail.com
+            email, 
           },
           {
-            username, // username : ema2023
+            username, 
           },
         ],
       });

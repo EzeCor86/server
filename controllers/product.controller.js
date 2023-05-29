@@ -16,8 +16,8 @@ module.exports = {
               description: { $regex: q, $options: "i" },
             },
           ],
-        }; //name --> Samsung A33  --> samsung A33
-      } //cliente -->  q --> A33
+        }; 
+      } 
 
       const products = await Product.find(options);
       res.status(200).json({
@@ -34,7 +34,7 @@ module.exports = {
   },
   detailProduct: async (req, res) => {
     try {
-      const { idProduct } = req.params; // 6451a73c6c4ce11c7e55f05c
+      const { idProduct } = req.params; 
       const productFound = await Product.findById(idProduct);
 
       if (!productFound) {
@@ -52,7 +52,6 @@ module.exports = {
     }
   },
   createProduct: async (req, res) => {
-    // req.body es un objeto que trae info desde el cliente
     try {
       const { name, description, price, discount, images } = req.body;
 
