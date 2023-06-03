@@ -9,7 +9,7 @@ const {
   updateProduct,
   toggleProduct
 } = require("./controllers/product.controller");
-const { login, register,getUser } = require("./controllers/user.controller");
+const { login, register,getUsers,updateUser } = require("./controllers/user.controller");
 const app = express();
 const cors = require("cors");
 const connectionMongo = require("./database/config.js");
@@ -49,9 +49,11 @@ app.delete("/products/:idProduct", checkToken, deleteProduct);
 app.put("/products/:idProduct", checkToken, updateProduct);
 
 // Entidades: Usuarios
-app.post("/users",checkToken, getUser);
+// app.post("/users",checkToken, postUser);
+app.get("/users", getUsers);
 app.post("/users/login", login);
 app.post("/users/register", register);
+app.put("/users/:idUser", checkToken, updateUser);
 
 const port = process.env.PORT;
 app.listen(port, () => {

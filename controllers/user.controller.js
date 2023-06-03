@@ -95,14 +95,14 @@ module.exports = {
       });
     }
   },
-  getUser: async (req, res) => {
-    try {
-      if (req.userToken) {
-        const user = await User.findOne({
-          email: req.userToken.email,
-        });
 
-        if (!user) {
+  
+  getUsers: async (req, res) => {
+    try {
+    {
+        const users = await User.find();
+
+        if (!users.length) {
           return res.status(404).json({
             ok: false,
             message: "El usuario no existe",
@@ -111,14 +111,52 @@ module.exports = {
 
         res.status(200).json({
           ok: true,
-          data: user,
+          data: users,
         });
       }
     } catch (error) {
-      res.status(500).json({
+      res.status(200).json({
         ok: true,
-        message: "Error de servidor",
+        message: "no hay usuarios",
       });
     }
   },
-};
+  updateUser: async (req, res) => {
+    try {
+      const { username, password, email, rol, available, avatar } = req.body;
+      const { idUser } = req.params;
+  
+      const user = await User.findById(idUser);
+  
+      if (!user) {
+        return res.status(404).json({
+          ok: false,
+          message: "El usuario no existe",
+        });
+      }
+  
+      user.username = username;
+      user.password = password;
+      user.email = email;
+      user.rol = rol;
+      user.available = available;
+      user.avatar = avatar;
+      await user.save();
+  
+      res.status(200).json({
+        ok: true,
+        message: "Usuario actualizado",
+        data: user,
+      });
+    } catch (error) {
+      res.status(500).json({
+        ok: false,
+        message: error.message,
+      });
+    }
+  }
+  }
+
+
+
+
