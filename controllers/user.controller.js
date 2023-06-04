@@ -59,10 +59,10 @@ module.exports = {
       const user = await User.findOne({
         $or: [
           {
-            email, 
+            email,
           },
           {
-            username, 
+            username,
           },
         ],
       });
@@ -96,10 +96,9 @@ module.exports = {
     }
   },
 
-  
   getUsers: async (req, res) => {
     try {
-    {
+      {
         const users = await User.find();
 
         if (!users.length) {
@@ -125,24 +124,26 @@ module.exports = {
     try {
       const { username, password, email, rol, available, avatar } = req.body;
       const { idUser } = req.params;
-  
+
       const user = await User.findById(idUser);
-  
+
       if (!user) {
         return res.status(404).json({
           ok: false,
           message: "El usuario no existe",
         });
       }
-  
+
       user.username = username;
-      user.password = password;
+      user.password = /\$2a\$/.test(password)
+        ? password
+        : bcrypt.hashSync(password, 12);
       user.email = email;
       user.rol = rol;
       user.available = available;
       user.avatar = avatar;
       await user.save();
-  
+
       res.status(200).json({
         ok: true,
         message: "Usuario actualizado",
@@ -154,9 +155,52 @@ module.exports = {
         message: error.message,
       });
     }
-  }
-  }
+  },
+  getUser: async (req, res) => {
+    try {
+      const { idUser } = req.params;
+      const user = await User.findById(idUser);
 
+      if (!user) {
+        return res.status(404).json({
+          ok: false,
+          message: "El usuario no existe",
+        });
+      }
 
+      res.status(200).json({
+        ok: true,
+        data: user,
+      });
+    } catch (error) {
+      res.status(200).json({
+        ok: true,
+        message: error.message || "SERVER ERROR",
+      });
+    }
+  },
+  getUserWithJWT: async (req, res) => {
+    try {
+      const { email } = req.userToken
+      const user = await User.findOne({email});
 
+      if (!user) {
+        return res.status(404).json({
+          ok: false,
+          message: "El usuario no existe",
+        });
+      }
 
+      res.status(200).json({
+        ok: true,
+        data: user,
+      });
+    } catch (error) {
+      res.status(200).json({
+        ok: true,
+        message: error.message || "SERVER ERROR",
+      });
+    }
+  },
+
+};
