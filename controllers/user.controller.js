@@ -156,6 +156,30 @@ module.exports = {
       });
     }
   },
+
+  deleteUser: async (req, res) => {
+    try {
+      const { idUser } = req.params;
+      const { deletedCount } = await User.deleteOne({ _id: idUser });
+
+      if (deletedCount === 0) {
+        return res.status(404).json({
+          ok: false,
+          message: "El usuario no existe | ya fue eliminado",
+        });
+      }
+
+      res.status(200).json({
+        ok: true,
+        message: "Usuario eliminado con éxito",
+      });
+    } catch (error) {
+      res.status(500).json({
+        ok: false,
+        message: error.message,
+      });
+    }
+  },
   getUser: async (req, res) => {
     try {
       const { idUser } = req.params;

@@ -16,6 +16,7 @@ const {
   updateUser,
   getUser,
   getUserWithJWT,
+  deleteUser,
 } = require("./controllers/user.controller");
 const app = express();
 const cors = require("cors");
@@ -61,6 +62,7 @@ app.post("/users/login", login);
 app.post("/users/register", register);
 app.put("/users/:idUser", checkToken, updateUser);
 app.get("/users/:idUser", getUser);
+app.delete("/users/:idUser", checkToken, deleteUser);
 
 const port = process.env.PORT;
 app.listen(port, () => {
