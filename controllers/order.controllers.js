@@ -13,7 +13,18 @@ const findOrCreate = async ({ model, where, defaults }) => {
 };
 
 module.exports = orderMethods = {
-  getOrders: async (req, res) => {},
+  getOrders: async (req, res) => {
+    try {
+      const orders = await Order.find().populate([
+        "products.product",
+        "userId",
+      ]);
+      res.status(200).json({
+        ok: true, // enviamos como respuesta solo los productos
+        data: orders,
+      });
+    } catch (error) {}
+  },
   getOrderFromUser: async (req, res) => {},
   addProduct: async (req, res) => {
     try {
@@ -35,11 +46,11 @@ module.exports = orderMethods = {
         order.products.push({ product: productId }); // si no existe el producto se agrega
       }
 
-      await (await order.save()).populate("products.product"); // guardamos e inyectamos información con el populate para poder enviar como respuesta la información de los productos
+      await (await order.save()).populate(["products.product", "userId"]); // guardamos e inyectamos información con el populate para poder enviar como respuesta la información de los productos
 
       res.status(200).json({
         ok: true,
-        data: order.products, // enviamos como respuesta solo los productos
+        data: order, // enviamos como respuesta solo los productos
       });
     } catch (error) {
       res.status(500).json({ ok: false, message: error.message });
@@ -60,33 +71,27 @@ module.exports = orderMethods = {
         ],
       });
 
-      if (!order) {
-        order = await Order.create({
-          // si la orden no existe la creamos
-          userId,
-          products: [],
+      if (order) {
+        const existProduct = order.products.some(
+          // evaluamos si alguno de los productos coincide con la condición indicada (investigar el método de array "SOME")
+          ({ product }) => product.toString() === productId
+        );
+
+        if (existProduct) {
+          // si existe el producto se asigna a order.products un nuevo array con los productos distintos al productId
+          order.products = order.products.filter(
+            ({ product }) => product.toString() !== productId
+          );
+        }
+
+        // guardamos e inyectamos información con el populate para poder enviar como respuesta la información de los productos
+        await (await order.save()).populate("products.product");
+
+        return res.status(200).json({
+          ok: true,
+          data: order.products, // enviamos como respuesta solo los productos
         });
       }
-
-      const existProduct = order.products.some(
-        // evaluamos si alguno de los productos coincide con la condición indicada (investigar el método de array "SOME")
-        ({ product }) => product.toString() === productId
-      );
-
-      if (existProduct) {
-        // si existe el producto se asigna a order.products un nuevo array con los productos distintos al productId
-        order.products = order.products.filter(
-          ({ product }) => product.toString() !== productId
-        );
-      }
-
-      // guardamos e inyectamos información con el populate para poder enviar como respuesta la información de los productos
-      await (await order.save()).populate("products.product");
-
-      res.status(200).json({
-        ok: true,
-        data: order.products, // enviamos como respuesta solo los productos
-      });
     } catch (error) {
       res.status(500).json({ ok: false, message: error.message });
     }

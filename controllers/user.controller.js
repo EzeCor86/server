@@ -1,12 +1,12 @@
 const User = require("../database/models/User");
-const {hash,compare} = require('bcryptjs')
+const { hash, compare } = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 module.exports = {
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
-      
+
       const user = await User.findOne({
         $and: [
           {
@@ -24,11 +24,8 @@ module.exports = {
         });
       }
 
-      const isPassValid = await compare(password,user.password);
-      console.log(password)
-      console.log(user.password)
-      console.log(isPassValid)
-      console.log(user)
+      const isPassValid = compare(password, user.password);
+
       if (!isPassValid) {
         return res.status(400).json({
           ok: false,
@@ -81,7 +78,7 @@ module.exports = {
 
       const newUser = await User.create({
         email,
-        password: await hash(password,12),
+        password: await hash(password, 12),
         username,
       });
 
@@ -140,7 +137,7 @@ module.exports = {
       }
 
       user.username = username;
-/*       user.password = /\$2a\$/.test(password)
+      /*       user.password = /\$2a\$/.test(password)
         ? password
         : bcrypt.hashSync(password, 12); */
       user.email = email;
@@ -210,8 +207,7 @@ module.exports = {
   },
   getUserWithJWT: async (req, res) => {
     try {
-      const { email } = req.userToken
-      const user = await User.findOne({email});
+      const user = await User.findOne({ email: req.userToken?.email });
 
       if (!user) {
         return res.status(404).json({
@@ -231,5 +227,4 @@ module.exports = {
       });
     }
   },
-
 };
