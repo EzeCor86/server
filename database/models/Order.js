@@ -1,6 +1,6 @@
 const { Schema, model } = require("mongoose");
 
-const statusValid = ["Pending", "Completed", "Cancel"];
+const statusValid = ["Pending", "Completed", "Cancel","In process"];
 const OrderScheme = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
@@ -26,7 +26,6 @@ const OrderScheme = new Schema({
   },
   total: {
     type: Number,
-    require: true,
     default: 0,
   },
 });

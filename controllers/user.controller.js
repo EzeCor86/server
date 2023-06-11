@@ -1,11 +1,12 @@
 const User = require("../database/models/User");
-const bcrypt = require("bcryptjs");
+const {hash,compare} = require('bcryptjs')
 const jwt = require("jsonwebtoken");
 
 module.exports = {
   login: async (req, res) => {
     try {
       const { email, password } = req.body;
+      
       const user = await User.findOne({
         $and: [
           {
@@ -23,7 +24,11 @@ module.exports = {
         });
       }
 
-      const isPassValid = bcrypt.compareSync(password, user.password);
+      const isPassValid = await compare(password,user.password);
+      console.log(password)
+      console.log(user.password)
+      console.log(isPassValid)
+      console.log(user)
       if (!isPassValid) {
         return res.status(400).json({
           ok: false,
@@ -36,7 +41,7 @@ module.exports = {
         { rol: user.rol, email: user.email },
         process.env.PASSWORD_SECRET,
         {
-          expiresIn: 500,
+          expiresIn: 60000,
         }
       );
 
@@ -76,7 +81,7 @@ module.exports = {
 
       const newUser = await User.create({
         email,
-        password: bcrypt.hashSync(password, 12),
+        password: await hash(password,12),
         username,
       });
 
@@ -135,9 +140,9 @@ module.exports = {
       }
 
       user.username = username;
-      user.password = /\$2a\$/.test(password)
+/*       user.password = /\$2a\$/.test(password)
         ? password
-        : bcrypt.hashSync(password, 12);
+        : bcrypt.hashSync(password, 12); */
       user.email = email;
       user.rol = rol;
       user.available = available;

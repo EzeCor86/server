@@ -21,48 +21,46 @@ const {
 const app = express();
 const cors = require("cors");
 const connectionMongo = require("./database/config.js");
+const {
+  addProduct,
+  removeProduct,
+  moreQuantityProduct,
+  lessQuantityProduct,
+  getOrders,
+  getOrderFromUser,
+  completedOrder,
+} = require("./controllers/order.controllers");
+const checkTokenAdmin = require("./middleware/checkTokenAdmin");
+const checkTokenRegular = require("./middleware/checkTokenRegular");
 connectionMongo();
 app.use(cors());
 app.use(express.json()); // middleware a nivel aplicación
 
-const checkToken = (req, res, next) => {
-  try {
-    const token = req.header("Authorization");
-    console.log(token);
-    const dataToken = jwt.verify(token, process.env.PASSWORD_SECRET);
-    req.userToken = dataToken;
-    if (dataToken.rol === "ADMIN") {
-      return next();
-    } else {
-      return res.status(403).json({
-        ok: false,
-        message: "No se puede realizar esta acción",
-      });
-    }
-  } catch (error) {
-    res.status(403).json({
-      ok: false,
-      message: "Token invalido",
-    });
-  }
-};
-
 // Entidades: Productos
 app.get("/products", getProducts); // <-- controlador
-app.put("/products/toggle/:idProduct", checkToken, toggleProduct); // <-- controlador
-app.post("/products", checkToken, createProduct);
+app.put("/products/toggle/:idProduct", checkTokenAdmin, toggleProduct); // <-- controlador
+app.post("/products", checkTokenAdmin, createProduct);
 app.get("/products/:idProduct", detailProduct);
-app.delete("/products/:idProduct", checkToken, deleteProduct);
-app.put("/products/:idProduct", checkToken, updateProduct);
+app.delete("/products/:idProduct", checkTokenAdmin, deleteProduct);
+app.put("/products/:idProduct", checkTokenAdmin, updateProduct);
 
 // Entidades: Usuarios
-app.post("/users", checkToken, getUserWithJWT);
-app.get("/users", checkToken, getUsers);
+app.post("/users", getUserWithJWT);
+app.get("/users", checkTokenAdmin, getUsers);
 app.post("/users/login", login);
 app.post("/users/register", register);
-app.put("/users/:idUser", checkToken, updateUser);
+app.put("/users/:idUser", checkTokenAdmin, updateUser);
 app.get("/users/:idUser", getUser);
-app.delete("/users/:idUser", checkToken, deleteUser);
+app.delete("/users/:idUser", checkTokenAdmin, deleteUser);
+
+app.get("/orders", checkTokenAdmin, getOrders);
+
+app.get("/order", checkTokenRegular, getOrderFromUser);
+app.put("/order/complete", checkTokenAdmin, completedOrder);
+app.put("/order/add", checkTokenRegular, addProduct);
+app.put("/order/remove", checkTokenRegular, removeProduct);
+app.put("/order/moreQuantity", checkTokenRegular, moreQuantityProduct);
+app.put("/order/lessQuantity", checkTokenRegular, lessQuantityProduct);
 
 const port = process.env.PORT;
 app.listen(port, () => {

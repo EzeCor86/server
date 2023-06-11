@@ -1,27 +1,30 @@
 const { Order } = require("../database/models");
+
+const findOrCreate = async ({ model, where, defaults }) => {
+  let order = await model.findOne(where);
+  let isCreate = true;
+  if (order) {
+    isCreate = false;
+  } else {
+    order = await model.create(defaults);
+  }
+
+  return [order, isCreate];
+};
+
 module.exports = orderMethods = {
+  getOrders: async (req, res) => {},
+  getOrderFromUser: async (req, res) => {},
   addProduct: async (req, res) => {
     try {
       const { userId, productId } = req.body;
-      let order = await Order.findOne({
-        // buscamos la orden
-        $and: [
-          {
-            userId,
-          },
-          {
-            status: "Pending",
-          },
-        ],
+      const [order, isCreate] = await findOrCreate({
+        model: Order,
+        where: {
+          $and: [{ userId }, { status: "Pending" }],
+        },
+        defaults: { userId },
       });
-
-      if (!order) {
-        order = await Order.create({
-          // si la orden no existe la creamos
-          userId,
-          products: [],
-        });
-      }
 
       const existProduct = order.products.some(
         // evaluamos si alguno de los productos coincide con la condición indicada
