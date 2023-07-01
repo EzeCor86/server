@@ -29,6 +29,7 @@ const {
   getOrders,
   getOrderFromUser,
   completedOrder,
+  getQuantity,
 } = require("./controllers/order.controllers");
 const checkTokenAdmin = require("./middleware/checkTokenAdmin");
 const checkTokenRegular = require("./middleware/checkTokenRegular");
@@ -61,6 +62,7 @@ app.put("/order/add", checkTokenRegular, addProduct);
 app.put("/order/remove", checkTokenRegular, removeProduct);
 app.put("/order/moreQuantity", checkTokenRegular, moreQuantityProduct);
 app.put("/order/lessQuantity", checkTokenRegular, lessQuantityProduct);
+app.post("/order/getQuantity", checkTokenRegular, getQuantity);
 
 const port = process.env.PORT;
 app.listen(port, () => {

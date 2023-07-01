@@ -4,7 +4,7 @@ const checkTokenRegular = (req, res, next) => {
     const token = req.header("Authorization");
     const dataToken = jwt.verify(token, process.env.PASSWORD_SECRET);
     req.userToken = dataToken;
-    if (dataToken.rol === "REGULAR") {
+    if (dataToken.rol === 'ADMIN' || dataToken.rol === 'REGULAR') {
       return next();
     } else {
       return res.status(403).json({

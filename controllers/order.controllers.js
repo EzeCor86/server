@@ -28,7 +28,7 @@ module.exports = orderMethods = {
   getOrderFromUser: async (req, res) => {},
   addProduct: async (req, res) => {
     try {
-      const { userId, productId } = req.body;
+      const { userId, productId, comment } = req.body;
       const [order, isCreate] = await findOrCreate({
         model: Order,
         where: {
@@ -43,7 +43,7 @@ module.exports = orderMethods = {
       );
 
       if (!existProduct) {
-        order.products.push({ product: productId }); // si no existe el producto se agrega
+        order.products.push({ product: productId, comment }); // si no existe el producto se agrega
       }
 
       await (await order.save()).populate(["products.product", "userId"]); // guardamos e inyectamos información con el populate para poder enviar como respuesta la información de los productos
@@ -118,7 +118,7 @@ module.exports = orderMethods = {
       }
 
       order.status = "Completed";
-      order.save();
+      await order.save();
 
       res.status(200).json({
         ok: true,
@@ -246,4 +246,40 @@ module.exports = orderMethods = {
       data: product,
     });
   },
+  getQuantity:async (req,res) => {
+    const { userId, productId } = req.body;
+    const order = await Order.findOne({
+      $and: [
+        {
+          userId,
+        },
+        {
+          status: "Pending",
+        },
+      ],
+    });
+    if (!order) {
+      return res.status(404).json({
+        ok: false,
+        message: "La orden no existe",
+      });
+    }
+
+    const products = order.products;
+
+    const product = products.find(
+      ({ product }) => product.toString() === productId
+    );
+
+    if (!product) {
+      return res.status(404).json({
+        ok: false,
+        message: "El producto no existe",
+      });
+    }
+    res.status(200).json({
+      ok: true,
+      data: product.quantity,
+    });
+  }
 };

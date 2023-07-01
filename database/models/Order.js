@@ -17,6 +17,9 @@ const OrderScheme = new Schema({
         type: Number,
         default: 1,
       },
+      comment: {
+        type:String,
+      },
     },
   ],
   status: {
@@ -24,6 +27,7 @@ const OrderScheme = new Schema({
     default: "Pending",
     enum: statusValid,
   },
+ 
   total: {
     type: Number,
     default: 0,
