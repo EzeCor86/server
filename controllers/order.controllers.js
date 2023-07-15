@@ -20,7 +20,7 @@ module.exports = orderMethods = {
         "userId",
       ]);
       res.status(200).json({
-        ok: true, // enviamos como respuesta solo los productos
+        ok: true, 
         data: orders,
       });
     } catch (error) {}
@@ -38,19 +38,19 @@ module.exports = orderMethods = {
       });
 
       const existProduct = order.products.some(
-        // evaluamos si alguno de los productos coincide con la condición indicada
+        
         ({ product }) => product.toString() === productId
       );
 
       if (!existProduct) {
-        order.products.push({ product: productId, comment }); // si no existe el producto se agrega
+        order.products.push({ product: productId, comment });
       }
 
-      await (await order.save()).populate(["products.product", "userId"]); // guardamos e inyectamos información con el populate para poder enviar como respuesta la información de los productos
+      await (await order.save()).populate(["products.product", "userId"]); 
 
       res.status(200).json({
         ok: true,
-        data: order, // enviamos como respuesta solo los productos
+        data: order,
       });
     } catch (error) {
       res.status(500).json({ ok: false, message: error.message });
@@ -60,7 +60,7 @@ module.exports = orderMethods = {
     try {
       const { userId, productId } = req.body;
       let order = await Order.findOne({
-        // buscamos la orden
+      
         $and: [
           {
             userId,
@@ -73,23 +73,23 @@ module.exports = orderMethods = {
 
       if (order) {
         const existProduct = order.products.some(
-          // evaluamos si alguno de los productos coincide con la condición indicada (investigar el método de array "SOME")
+      
           ({ product }) => product.toString() === productId
         );
 
         if (existProduct) {
-          // si existe el producto se asigna a order.products un nuevo array con los productos distintos al productId
+        
           order.products = order.products.filter(
             ({ product }) => product.toString() !== productId
           );
         }
 
-        // guardamos e inyectamos información con el populate para poder enviar como respuesta la información de los productos
+        
         await (await order.save()).populate("products.product");
 
         return res.status(200).json({
           ok: true,
-          data: order.products, // enviamos como respuesta solo los productos
+          data: order.products, 
         });
       }
     } catch (error) {

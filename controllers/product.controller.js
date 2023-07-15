@@ -22,7 +22,7 @@ module.exports = {
       const products = await Product.find(options);
       res.status(200).json({
         ok: true,
-        // quantity: products.length,
+        
         data: products,
       });
     } catch (error) {

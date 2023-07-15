@@ -33,7 +33,7 @@ module.exports = {
         });
       }
 
-      // JSON WEB TOKEN CREATE
+     
       const token = jwt.sign(
         { rol: user.rol, email: user.email },
         process.env.PASSWORD_SECRET,
@@ -82,7 +82,7 @@ module.exports = {
         username,
       });
 
-      // TO DO  Send email
+     
 
       res.status(201).json({
         ok: true,
@@ -137,9 +137,7 @@ module.exports = {
       }
 
       user.username = username;
-      /*       user.password = /\$2a\$/.test(password)
-        ? password
-        : bcrypt.hashSync(password, 12); */
+      
       user.email = email;
       user.rol = rol;
       user.available = available;

@@ -35,17 +35,17 @@ const checkTokenAdmin = require("./middleware/checkTokenAdmin");
 const checkTokenRegular = require("./middleware/checkTokenRegular");
 connectionMongo();
 app.use(cors());
-app.use(express.json()); // middleware a nivel aplicación
+app.use(express.json()); 
 
-// Entidades: Productos
-app.get("/products", getProducts); // <-- controlador
-app.put("/products/toggle/:idProduct", checkTokenAdmin, toggleProduct); // <-- controlador
+
+app.get("/products", getProducts); 
+app.put("/products/toggle/:idProduct", checkTokenAdmin, toggleProduct); 
 app.post("/products", checkTokenAdmin, createProduct);
 app.get("/products/:idProduct", detailProduct);
 app.delete("/products/:idProduct", checkTokenAdmin, deleteProduct);
 app.put("/products/:idProduct", checkTokenAdmin, updateProduct);
 
-// Entidades: Usuarios
+
 app.post("/users", getUserWithJWT);
 app.get("/users", checkTokenAdmin, getUsers);
 app.post("/users/login", login);
